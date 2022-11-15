@@ -38,7 +38,7 @@ public class App {
         List<NoFlyArea> areas = new ArrayList<>();
         areas.add(a);
         areas.add(b);
-        VisibilityGraph g = new VisibilityGraph(areas, new LngLat(0, 3), new LngLat(5, 3));
-        var path = g.shortestPath();
+        //VisibilityGraph g = new VisibilityGraph(areas, new LngLat(0, 3), new LngLat(5, 3));
+        //var path = g.shortestPath();
     }
 }

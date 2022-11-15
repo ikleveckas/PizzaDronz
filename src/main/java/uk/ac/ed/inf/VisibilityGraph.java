@@ -1,18 +1,20 @@
 package uk.ac.ed.inf;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.PriorityQueue;
 
 public class VisibilityGraph {
     private HashMap<LngLat, List<LngLat>> adjLists;
     private List<LngLat> vertices;
     private LngLat start;
     private LngLat end;
-    public VisibilityGraph(List<NoFlyArea> noFlyAreas, LngLat start, LngLat end) {
+
+    private CentralArea centralArea;
+    public VisibilityGraph(List<NoFlyArea> noFlyAreas,
+                           LngLat start, LngLat end,
+                           CentralArea centralArea) {
         this.start = start;
         this.end = end;
+        this.centralArea = centralArea;
         adjLists = new HashMap<>();
         vertices = getAllVertices(noFlyAreas);
         vertices.add(start);
@@ -21,8 +23,9 @@ public class VisibilityGraph {
     }
 
 
-    public List<LngLat> shortestPath() {
-        List<LngLat> path = new ArrayList<>();
+    public LinkedList<LngLat> shortestPath() {
+        //List<LngLat> path = new ArrayList<>();
+        LinkedList<LngLat> path = new LinkedList<>();
 
         HashMap<LngLat, Double> dist = new HashMap<>();
         HashMap<LngLat, LngLat> prev = new HashMap<>();
@@ -57,7 +60,7 @@ public class VisibilityGraph {
         var u = end;
         if (prev.get(u) != null || u.equals(start)) {
             while (u != null) {
-                path.add(0, u);
+                path.addFirst(u);
                 u = prev.get(u);
             }
         }
