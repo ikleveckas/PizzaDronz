@@ -1,4 +1,4 @@
-package uk.ac.ed.inf;
+package uk.ac.ed.inf.Navigation;
 
 public class QueueEntry implements Comparable<QueueEntry> {
     private LngLat key;

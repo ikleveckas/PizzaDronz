@@ -1,4 +1,4 @@
-package uk.ac.ed.inf;
+package uk.ac.ed.inf.Exceptions;
 
 /**
  * Exception used when the ordered pizza combination cannot be delivered

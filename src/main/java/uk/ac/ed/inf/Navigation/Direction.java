@@ -1,4 +1,4 @@
-package uk.ac.ed.inf;
+package uk.ac.ed.inf.Navigation;
 
 /**
  * Represents the 16 different compass directions the drone can face.

@@ -1,9 +1,9 @@
 package uk.ac.ed.inf;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.ac.ed.inf.Navigation.LngLat;
+
 import java.net.URL;
-import java.io.IOException ;
 
 /**
  * Represents a restaurant that can provide pizzas to the PizzaDronz service.
@@ -34,19 +34,6 @@ public class Restaurant {
      * @return The array of restaurants which are defined on the server.
      */
     public static Restaurant[] getRestaurantsFromRestServer(URL serverBaseAddress) {
-        Restaurant[] payload = null;
-        URL url;
-        try {
-            if (!serverBaseAddress.toString().endsWith("/")) {
-                url = new URL(serverBaseAddress + "/restaurants");
-            } else {
-                url = new URL(serverBaseAddress + "restaurants");
-            }
-            ObjectMapper objectMapper = new ObjectMapper();
-            payload = objectMapper.readValue(url, Restaurant[].class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return payload;
+        return new RestClient(serverBaseAddress).deserialise("/restaurants", Restaurant[].class);
     }
 }

@@ -3,6 +3,7 @@ package uk.ac.ed.inf;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import uk.ac.ed.inf.Exceptions.InvalidPizzaCombinationException;
 
 import java.io.IOException;
 import java.net.URL;

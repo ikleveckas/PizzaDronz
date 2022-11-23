@@ -1,9 +1,11 @@
-package uk.ac.ed.inf;
+package uk.ac.ed.inf.Navigation;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import static uk.ac.ed.inf.Direction.HOVER;
+import java.util.List;
+
+import static uk.ac.ed.inf.Navigation.Direction.HOVER;
 
 /**
  * Representation of the point on a 2D plane.
@@ -27,6 +29,7 @@ public record LngLat(@JsonProperty("longitude") double lng,
      * <code>false</code> if the point is not in the Central area or
      * if the Central area coordinates cannot be retrieved from the server.
      */
+
     public boolean inCentralArea() {
         // The Central area coordinates are accessed using the default REST-service URL.
         // Default URL is represented by null.
@@ -35,7 +38,7 @@ public record LngLat(@JsonProperty("longitude") double lng,
         if (centralArea != null) {
             return (onCorner(centralArea) ||
                     onBoundary(centralArea) ||
-                    strictlyInsideArea(centralArea));
+                    strictlyInsideArea(List.of(centralArea)));
         } else {
             return false;
         }
@@ -55,16 +58,16 @@ public record LngLat(@JsonProperty("longitude") double lng,
      * @return <code>true</code> if this point is strictly within the given polygon;
      * <code>false</code> if this point is outside the given area.
      */
-    private boolean strictlyInsideArea(LngLat[] corners) {
+    public boolean strictlyInsideArea(List<LngLat> corners) {
         boolean result = false;
         int i, j;
-        for (i = 0, j = corners.length - 1; i < corners.length; j = i++) {
+        for (i = 0, j = corners.size() - 1; i < corners.size(); j = i++) {
             // Checks if the edge of the polygon is crossed
-            if ((corners[i].lat > lat) != (corners[j].lat > lat) &&
-                    (lng < (corners[j].lng - corners[i].lng)
-                            * (lat - corners[i].lat)
-                            / (corners[j].lat - corners[i].lat)
-                            + corners[i].lng)) {
+            if ((corners.get(i).lat > lat) != (corners.get(j).lat > lat) &&
+                    (lng < (corners.get(j).lng - corners.get(i).lng)
+                            * (lat - corners.get(i).lat)
+                            / (corners.get(j).lat - corners.get(i).lat)
+                            + corners.get(i).lng)) {
                 // Each time the edge is crossed,
                 // the point switches between inside and outside
                 result = !result;
@@ -164,6 +167,7 @@ public record LngLat(@JsonProperty("longitude") double lng,
     }
 
     public static boolean intersect(LngLat a1, LngLat a2, LngLat b1, LngLat b2) {
+        // maybe move to edge
         var det = (a2.lng - a1.lng) * (b2.lat - b1.lat)
                 - (b2.lng - b1.lng) * (a2.lat - a1.lat);
         if (det == 0) {
@@ -178,4 +182,7 @@ public record LngLat(@JsonProperty("longitude") double lng,
     }
 
 
+    public LngLat copy() {
+        return new LngLat(lng, lat);
+    }
 }

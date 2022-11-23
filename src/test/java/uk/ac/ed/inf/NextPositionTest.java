@@ -3,6 +3,8 @@ package uk.ac.ed.inf;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import uk.ac.ed.inf.Navigation.Direction;
+import uk.ac.ed.inf.Navigation.LngLat;
 
 public class NextPositionTest
         extends TestCase

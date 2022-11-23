@@ -1,4 +1,9 @@
-package uk.ac.ed.inf;
+package uk.ac.ed.inf.Navigation;
+import uk.ac.ed.inf.Navigation.Area;
+import uk.ac.ed.inf.Navigation.Edge;
+import uk.ac.ed.inf.Navigation.LngLat;
+import uk.ac.ed.inf.Navigation.QueueEntry;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -7,19 +12,15 @@ public class VisibilityGraph {
     private List<LngLat> vertices;
     private LngLat start;
     private LngLat end;
-
-    private CentralArea centralArea;
-    public VisibilityGraph(List<NoFlyArea> noFlyAreas,
-                           LngLat start, LngLat end,
-                           CentralArea centralArea) {
+    public VisibilityGraph(List<Area> areas,
+                           LngLat start, LngLat end) {
         this.start = start;
         this.end = end;
-        this.centralArea = centralArea;
         adjLists = new HashMap<>();
-        vertices = getAllVertices(noFlyAreas);
+        vertices = getAllVertices(areas);
         vertices.add(start);
         vertices.add(end);
-        buildGraph(noFlyAreas, start, end);
+        buildGraph(areas, start, end);
     }
 
 
@@ -67,27 +68,27 @@ public class VisibilityGraph {
         return path;
     }
 
-    private List<LngLat> getAllVertices(List<NoFlyArea> noFlyAreas) {
+    private List<LngLat> getAllVertices(List<Area> areas) {
         List<LngLat> vertices = new ArrayList<>();
-        for (NoFlyArea area : noFlyAreas) {
+        for (Area area : areas) {
             vertices.addAll(area.vertices());
         }
         return vertices;
     }
 
-    private void buildGraph(List<NoFlyArea> noFlyAreas, LngLat start, LngLat end) {
-        for (NoFlyArea area : noFlyAreas) {
+    private void buildGraph(List<Area> areas, LngLat start, LngLat end) {
+        for (Area area : areas) {
             for (LngLat vertex : area.vertices()) {
                 var visibleFromVertex = visibleVertices(vertex, area,
-                        noFlyAreas.stream().filter(x -> !area.equals(x)).collect(Collectors.toList()),
+                        areas.stream().filter(x -> !area.equals(x)).collect(Collectors.toList()),
                         start, end);
                 fillGraph(vertex, visibleFromVertex);
             }
         }
 
         var visibleFromStart = visibleVertices(start,
-                new NoFlyArea(new ArrayList<>()),
-                noFlyAreas, start, end);
+                new Area(new ArrayList<>()),
+                areas, start, end);
         fillGraph(start, visibleFromStart);
 
         /* No need to add visibility from end as we are never going to move from the end
@@ -102,8 +103,8 @@ public class VisibilityGraph {
         adjLists.put(vertex, visibleFromVertex);
     }
 
-    private List<LngLat> visibleVertices(LngLat vertex, NoFlyArea thisArea,
-                                         List<NoFlyArea> otherAreas,
+    private List<LngLat> visibleVertices(LngLat vertex, Area thisArea,
+                                         List<Area> otherAreas,
                                          LngLat start, LngLat end) {
         var result = thisArea.getAdjacent(vertex);
         var otherVertices = getAllVertices(otherAreas);
@@ -126,7 +127,7 @@ public class VisibilityGraph {
         return result;
     }
 
-    private boolean visible(Edge visibilityLine, NoFlyArea thisArea, List<NoFlyArea> otherAreas) {
+    private boolean visible(Edge visibilityLine, Area thisArea, List<Area> otherAreas) {
         for (Edge e : thisArea.getEdges()) {
             if (e.intersects(visibilityLine)
                     || e.a().pointBetweenCorners(visibilityLine.a(), visibilityLine.b())
@@ -134,7 +135,7 @@ public class VisibilityGraph {
                 return false;
             }
         }
-        for (NoFlyArea otherArea : otherAreas) {
+        for (Area otherArea : otherAreas) {
             for (Edge e: otherArea.getEdges()) {
                 if (e.intersects(visibilityLine)
                         || e.a().pointBetweenCorners(visibilityLine.a(), visibilityLine.b())

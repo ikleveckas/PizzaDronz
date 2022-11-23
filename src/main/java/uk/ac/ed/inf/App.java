@@ -1,11 +1,12 @@
 package uk.ac.ed.inf;
 
-import java.io.IOException;
+import uk.ac.ed.inf.Navigation.Area;
+import uk.ac.ed.inf.Navigation.LngLat;
+import uk.ac.ed.inf.Navigation.Navigator;
+
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -20,6 +21,7 @@ public class App {
         LngLat b2 = new LngLat(0, 2);
         System.out.println(LngLat.intersect(a1, a2, b1, b2));
          */
+        /*
         List<LngLat> as = new ArrayList<>();
         as.add(new LngLat(1, 3));
         as.add(new LngLat(1, 2));
@@ -31,14 +33,28 @@ public class App {
         bs.add(new LngLat(3, 1));
         bs.add(new LngLat(4, 1));
         bs.add(new LngLat(4, 4));
+*/
+        /*
+        Area a = new Area(as);
+        Area b = new Area(bs);
 
-        NoFlyArea a = new NoFlyArea(as);
-        NoFlyArea b = new NoFlyArea(bs);
-
-        List<NoFlyArea> areas = new ArrayList<>();
+        List<Area> areas = new ArrayList<>();
         areas.add(a);
         areas.add(b);
         //VisibilityGraph g = new VisibilityGraph(areas, new LngLat(0, 3), new LngLat(5, 3));
         //var path = g.shortestPath();
+        Navigator navigator = new Navigator(areas);
+
+         */
+        //var visitedPoints = navigator.navigateTo(new LngLat(5, 3));
+        List<Area> noFlyZones = new ArrayList<>();
+        try {
+            noFlyZones = Area.getNoFlyZones(new URL("https://ilp-rest.azurewebsites.net/"));
+        } catch (MalformedURLException e) {
+
+        }
+        var navigator = new Navigator(noFlyZones);
+        var flightPath = navigator.navigateTo(new LngLat(-3.1915, 55.9424));
+        Output.createGeoJSON(flightPath);
     }
 }
