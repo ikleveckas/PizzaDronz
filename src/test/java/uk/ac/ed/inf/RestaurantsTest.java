@@ -4,6 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import uk.ac.ed.inf.Exceptions.InvalidPizzaCombinationException;
+import uk.ac.ed.inf.Exceptions.InvalidPizzaCountException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -43,7 +44,7 @@ public class RestaurantsTest
         try {
             assertEquals(order.getDeliveryCost(participants, new String[]{"Margarita", "Calzone", "Margarita"}),
                     3700);
-        } catch (InvalidPizzaCombinationException e) {
+        } catch (Exception e) {
             fail();
         }
     }
@@ -53,7 +54,7 @@ public class RestaurantsTest
         try {
             assertEquals(order.getDeliveryCost(participants, new String[]{"Super Cheese", "All Shrooms"}),
                     2500);
-        } catch (InvalidPizzaCombinationException e) {
+        } catch (Exception e) {
             fail();
         }
     }
@@ -63,7 +64,7 @@ public class RestaurantsTest
         try {
             int result = order.getDeliveryCost(participants, new String[]{});
             fail();
-        } catch (InvalidPizzaCombinationException e) {
+        } catch (Exception e) {
             assertTrue(true);
         }
     }
@@ -74,7 +75,7 @@ public class RestaurantsTest
             int result = order.getDeliveryCost(participants, new String[]{"Margarita",
                     "Margarita","Margarita","Margarita","Margarita"});
             fail();
-        } catch (InvalidPizzaCombinationException e) {
+        } catch (Exception e) {
             assertTrue(true);
         }
     }
@@ -85,7 +86,7 @@ public class RestaurantsTest
             int result = order.getDeliveryCost(participants, new String[]{"Margarita",
                     "All Shrooms"});
             fail();
-        } catch (InvalidPizzaCombinationException e) {
+        } catch (Exception e) {
             assertTrue(true);
         }
     }
@@ -95,7 +96,7 @@ public class RestaurantsTest
         try {
             int result = order.getDeliveryCost(participants, new String[]{"Omelette au Fromage"});
             fail();
-        } catch (InvalidPizzaCombinationException e) {
+        } catch (Exception e) {
             assertTrue(true);
         }
     }

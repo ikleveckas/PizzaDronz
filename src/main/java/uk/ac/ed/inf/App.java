@@ -13,7 +13,7 @@ import java.util.List;
  * Main class.
  */
 public class App {
-    public static void main( String[] args ) {
+    public static void main( String[] args ) throws MalformedURLException {
         /*
         LngLat a1 = new LngLat(0, 0);
         LngLat a2 = new LngLat(0, 4);
@@ -47,6 +47,7 @@ public class App {
 
          */
         //var visitedPoints = navigator.navigateTo(new LngLat(5, 3));
+        /*
         List<Area> noFlyZones = new ArrayList<>();
         try {
             noFlyZones = Area.getNoFlyZones(new URL("https://ilp-rest.azurewebsites.net/"));
@@ -54,7 +55,11 @@ public class App {
 
         }
         var navigator = new Navigator(noFlyZones);
-        var flightPath = navigator.navigateTo(new LngLat(-3.1915, 55.9424));
+        var flightPath = navigator.navigateTo(new LngLat(-3.1913, 55.9455));
         Output.createGeoJSON(flightPath);
+         */
+        var orders = Order.getOrdersFromRestServer(
+                new URL("https://ilp-rest.azurewebsites.net/"), "2023-04-24");
+
     }
 }

@@ -12,10 +12,13 @@ public class VisibilityGraph {
     private List<LngLat> vertices;
     private LngLat start;
     private LngLat end;
+
+    private List<Area> areas;
     public VisibilityGraph(List<Area> areas,
                            LngLat start, LngLat end) {
         this.start = start;
         this.end = end;
+        this.areas = areas;
         adjLists = new HashMap<>();
         vertices = getAllVertices(areas);
         vertices.add(start);
@@ -110,7 +113,7 @@ public class VisibilityGraph {
         var otherVertices = getAllVertices(otherAreas);
         for (LngLat otherVertex : otherVertices) {
             Edge visibilityLine = new Edge(vertex, otherVertex);
-            if (visible(visibilityLine, thisArea, otherAreas)) {
+            if (visible(visibilityLine, areas)) {
                 result.add(otherVertex);
             }
         }
@@ -121,22 +124,15 @@ public class VisibilityGraph {
         }
          */
         Edge visibilityLineEnd = new Edge(vertex, end);
-        if (visible(visibilityLineEnd, thisArea, otherAreas)) {
+        if (visible(visibilityLineEnd, areas)) {
             result.add(end);
         }
         return result;
     }
 
-    private boolean visible(Edge visibilityLine, Area thisArea, List<Area> otherAreas) {
-        for (Edge e : thisArea.getEdges()) {
-            if (e.intersects(visibilityLine)
-                    || e.a().pointBetweenCorners(visibilityLine.a(), visibilityLine.b())
-                    || e.b().pointBetweenCorners(visibilityLine.a(), visibilityLine.b())) {
-                return false;
-            }
-        }
-        for (Area otherArea : otherAreas) {
-            for (Edge e: otherArea.getEdges()) {
+    public static boolean visible(Edge visibilityLine, List<Area> areas) { // need to think where to place this
+        for (Area area : areas) {
+            for (Edge e: area.getEdges()) {
                 if (e.intersects(visibilityLine)
                         || e.a().pointBetweenCorners(visibilityLine.a(), visibilityLine.b())
                         || e.b().pointBetweenCorners(visibilityLine.a(), visibilityLine.b())) {

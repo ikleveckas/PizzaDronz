@@ -40,13 +40,7 @@ public class RestClient {
         T response = null;
 
         try {
-            var tmpURL = baseUrl.toString();
-            if (!tmpURL.endsWith("/") && !fromEndPoint.startsWith("/")) {
-                tmpURL += '/';
-            } else if (tmpURL.endsWith("/") && fromEndPoint.startsWith("/")) {
-                // drop the / from tmpUrl to avoid double /
-                tmpURL = tmpURL.substring(0, tmpURL.length() - 1);
-            }
+            var tmpURL = checkSlash(baseUrl.toString(), fromEndPoint);
             finalURL = new URL(new URL(tmpURL), fromEndPoint);
         } catch (MalformedURLException e) {
             System.err.println("URL is invalid: " + baseUrl + fromEndPoint);
@@ -60,5 +54,37 @@ public class RestClient {
         }
 
         return response;
+    }
+ // AVOID DOUBLE CODE
+    public <T> T deserialise(String fromEndPoint, String date, Class<T> klass) {
+        URL finalURL = null;
+        T response = null;
+
+        try {
+            var tmpURL1 = checkSlash(baseUrl.toString(), fromEndPoint);
+            var endpoint = checkSlash(fromEndPoint, date);
+            finalURL = new URL(new URL(tmpURL1), endpoint + date);
+        } catch (MalformedURLException e) {
+            System.err.println("URL is invalid: " + baseUrl + fromEndPoint);
+            System.exit(2);
+        }
+
+        try {
+            response = new ObjectMapper().readValue(finalURL, klass);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    private String checkSlash(String first, String second) {
+        if (!first.endsWith("/") && !second.startsWith("/")) {
+            return first + '/';
+        } else if (first.endsWith("/") && second.startsWith("/")) {
+            // drop the slash from second string to avoid double slash
+            return first.substring(0, first.length() - 1);
+        }
+        return first;
     }
 }
