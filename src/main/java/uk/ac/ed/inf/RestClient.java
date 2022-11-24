@@ -1,5 +1,6 @@
 package uk.ac.ed.inf;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedInputStream;
@@ -70,11 +71,12 @@ public class RestClient {
         }
 
         try {
-            response = new ObjectMapper().readValue(finalURL, klass);
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            response = objectMapper.readValue(finalURL, klass);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return response;
     }
 

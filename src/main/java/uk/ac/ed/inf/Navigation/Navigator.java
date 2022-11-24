@@ -11,31 +11,71 @@ public class Navigator { // maybe change it into singleton
     private LngLat dronePosition;
     private List<Area> noFlyAreas;
     private int movesLeft;
+    private List<Move> moves;
+    private List<Move> movesSinceAT;
+    private int ticksSinceStartOfCalculation;
+    private List<LngLat> visited;
+
+    private List<LngLat> visitedSinceAT;
 
     public Navigator(List<Area> noFlyAreas) {
         dronePosition = APPLETON;
         movesLeft = MAX_MOVES;
         this.noFlyAreas = noFlyAreas;
+        moves = new ArrayList<>();
+        ticksSinceStartOfCalculation = 0;
+        movesSinceAT = new ArrayList<>();
+        visited = new ArrayList<>();
+        visitedSinceAT = new ArrayList<>();
     }
 
-    public List<LngLat> navigateTo(LngLat end)
+    public List<LngLat> getVisited() {
+        return visited;
+    }
+
+    public List<LngLat> navigateTo(LngLat end, String orderNo)
             throws MoveLimitReachedException {
         var visibilityGraph = new VisibilityGraph(noFlyAreas, dronePosition, end); // could be optimised
+        movesLeft -= 1; // hovering
         // no need to create it every time, just update with new start/end
         List<LngLat> visitedPoints = new ArrayList<>();
         visitedPoints.add(dronePosition);
         var path = visibilityGraph.shortestPath();
+        if (end != APPLETON) {
+            moves.addAll(movesSinceAT);
+            visited.addAll(visitedSinceAT);
+            movesSinceAT = new ArrayList<Move>();
+        }
+        if (end == APPLETON) {
+            movesSinceAT.add(new Move(orderNo, dronePosition.lng(),
+                    dronePosition.lat(), Direction.HOVER.ANGLE,
+                    dronePosition.lng(), dronePosition.lat(),
+                    ticksSinceStartOfCalculation));
+        }
         path.removeFirst(); // we are already at start
         for (LngLat next : path) {
             while (!dronePosition.closeTo(next)) {
                 if (movesLeft == 0) {
                     throw new MoveLimitReachedException();
                 }
-                dronePosition = dronePosition.
-                        nextPosition(chooseBestDirection(dronePosition, next));
-                visitedPoints.add(dronePosition);
+                var bestDirection = chooseBestDirection(dronePosition, next);
+                var nextPosition = dronePosition.
+                        nextPosition(bestDirection);
+                movesSinceAT.add(new Move(orderNo, dronePosition.lng(),
+                        dronePosition.lat(), bestDirection.ANGLE,
+                        nextPosition.lng(), nextPosition.lat(),
+                        ticksSinceStartOfCalculation));
                 movesLeft -= 1;
+                dronePosition = nextPosition;
+                visitedPoints.add(dronePosition);
+                visitedSinceAT.add(dronePosition);
             }
+        }
+        if (end == APPLETON) {
+            movesSinceAT.add(new Move(orderNo, dronePosition.lng(),
+                    dronePosition.lat(), Direction.HOVER.ANGLE,
+                    dronePosition.lng(), dronePosition.lat(),
+                    ticksSinceStartOfCalculation));
         }
         return visitedPoints;
     }

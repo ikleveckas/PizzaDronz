@@ -58,8 +58,11 @@ public class App {
         var flightPath = navigator.navigateTo(new LngLat(-3.1913, 55.9455));
         Output.createGeoJSON(flightPath);
          */
+        /*
         var orders = Order.getOrdersFromRestServer(
                 new URL("https://ilp-rest.azurewebsites.net/"), "2023-04-24");
-
+*/
+        Model model = new Model("2023-01-14");
+        model.processOrders();
     }
 }

@@ -17,7 +17,7 @@ public class CreditCardValidation {
             InvalidExpiryDateException, InvalidCvvException {
         if (!validCardNo(cardNo)) {
             throw new InvalidCardNoException();
-        } else if (expired(cardNo, orderDate)) {
+        } else if (expired(expiryDate, orderDate)) {
             throw new InvalidExpiryDateException();
         } else if (!validCvv(cvv)) {
             throw new InvalidCvvException();
