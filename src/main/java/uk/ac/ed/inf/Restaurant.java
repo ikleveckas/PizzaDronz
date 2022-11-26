@@ -14,7 +14,7 @@ public class Restaurant {
     private String name; // name of the restaurant
     private LngLat coordinates; // coordinates of the restaurant
     private Menu[] menu; // menu entries of the restaurant
-    private double distanceFromAT; // used for sorting purpose
+    private double tripDistance; // used for sorting purpose
     private List<Order> ordersToRestaurant;
     public Restaurant(@JsonProperty("name") String name,
                       @JsonProperty("longitude") double longitude,
@@ -23,7 +23,7 @@ public class Restaurant {
         this.name = name;
         this.coordinates = new LngLat(longitude, latitude);
         this.menu = menu;
-        distanceFromAT = -1; // start with unreachable, will be updated later
+        tripDistance = -1; // start with unreachable, will be updated later
         ordersToRestaurant = new ArrayList<>();
     }
 
@@ -35,12 +35,12 @@ public class Restaurant {
         return ordersToRestaurant;
     }
 
-    public double getDistanceFromAT() {
-        return distanceFromAT;
+    public double getTripDistance() {
+        return tripDistance;
     }
 
-    public void setDistanceFromAT(double distanceFromAT) {
-        this.distanceFromAT = distanceFromAT;
+    public void setTripDistance(double distanceFromAT) {
+        this.tripDistance = distanceFromAT;
     }
 
     public LngLat getCoordinates() {
@@ -64,15 +64,15 @@ public class Restaurant {
     }
 
     public int compareTo(Restaurant other) {
-        if (distanceFromAT == -1 && other.distanceFromAT == -1) {
+        if (tripDistance == -1 && other.tripDistance == -1) {
             return 0;
-        } else if (distanceFromAT == -1) {
+        } else if (tripDistance == -1) {
             return 1;
-        } else if (other.distanceFromAT == -1) {
+        } else if (other.tripDistance == -1) {
             return -1;
-        } else if (distanceFromAT < other.distanceFromAT) {
+        } else if (tripDistance < other.tripDistance) {
             return -1;
-        } else if (distanceFromAT == other.distanceFromAT) {
+        } else if (tripDistance == other.tripDistance) {
             return 0;
         } else {
             return 1;

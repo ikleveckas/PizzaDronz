@@ -1,5 +1,6 @@
 package uk.ac.ed.inf;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.ac.ed.inf.Exceptions.*;
@@ -43,6 +44,7 @@ public class Order{
         outcome = Outcome.ValidButNotDelivered;// default
     }
 
+    @JsonIgnore
     public String[] getOrderItems() {
         return orderItems;
     }
@@ -50,19 +52,22 @@ public class Order{
     public int getPriceTotalInPence() {
         return priceTotalInPence;
     }
-
+    @JsonIgnore
     public String getCreditCardNumber() {
         return creditCardNumber;
     }
 
+    @JsonIgnore
     public String getCvv() {
         return cvv;
     }
 
+    @JsonIgnore
     public String getOrderDate() {
         return orderDate;
     }
 
+    @JsonIgnore
     public String getCreditCardExpiry() {
         return creditCardExpiry;
     }
@@ -185,8 +190,7 @@ public class Order{
             var calculatedPrice = getDeliveryCost(restaurants);
             if (calculatedPrice != priceTotalInPence) {
                 outcome = Outcome.InvalidTotal;
-            }
-            if (CreditCardValidation.validateCreditCard(
+            } else if (CreditCardValidation.validateCreditCard(
                     creditCardNumber, creditCardExpiry,
                     cvv, orderDate)) {
                 outcome = Outcome.ValidButNotDelivered;
@@ -205,4 +209,6 @@ public class Order{
             outcome = Outcome.InvalidCvv;
         }
     }
+
+
 }

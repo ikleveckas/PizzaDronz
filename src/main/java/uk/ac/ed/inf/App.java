@@ -62,7 +62,27 @@ public class App {
         var orders = Order.getOrdersFromRestServer(
                 new URL("https://ilp-rest.azurewebsites.net/"), "2023-04-24");
 */
+
         Model model = new Model("2023-01-14");
         model.processOrders();
+
+
+/*
+        List<Area> noFlyZones = new ArrayList<>();
+        try {
+            noFlyZones = Area.getNoFlyZones(new URL("https://ilp-rest.azurewebsites.net/"));
+        } catch (MalformedURLException e) {
+
+        }
+        var navigator = new Navigator(noFlyZones);
+        try {
+            navigator.navigateLoop(new LngLat(	-3.2025, 55.9433), "");
+        } catch (Exception e) {
+            var a = 0;
+        }
+        System.out.println(navigator.getVisited().size());
+        Output.createGeoJSON(navigator.getVisited());
+*/
+
     }
 }

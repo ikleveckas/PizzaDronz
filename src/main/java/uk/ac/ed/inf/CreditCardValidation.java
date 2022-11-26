@@ -61,16 +61,26 @@ public class CreditCardValidation {
         return false;
     }
 
+
     private static boolean isMastercard(String cardNo) {
-        if (cardNo.length() > 1) {
-            return cardNo.charAt(0) == '5' && (cardNo.charAt(1) == '1'
+        if (cardNo.length() > 3) {
+            var first = cardNo.charAt(0) == '5' && (cardNo.charAt(1) == '1'
                     || cardNo.charAt(1) == '2'
                     || cardNo.charAt(1) == '3'
                     || cardNo.charAt(1) == '4'
                     || cardNo.charAt(1) == '5');
+            try {
+                var second = Integer.parseInt(cardNo.substring(0, 4)); // maybe no need to parse
+                return first || (second >= 2221 && second <= 2720);
+            } catch (Exception e) {
+                return false;
+            }
         }
+
         return false;
     }
+
+
 
     private static boolean expired(String date, String orderDate) { // MIGHT NEED TO CHANGE FROM NOW TO ORDER DATE
         SimpleDateFormat creditCardFormat = new SimpleDateFormat("MM/yy");

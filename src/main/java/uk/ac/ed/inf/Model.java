@@ -2,14 +2,11 @@ package uk.ac.ed.inf;
 
 import uk.ac.ed.inf.Exceptions.*;
 import uk.ac.ed.inf.Navigation.Area;
-import uk.ac.ed.inf.Navigation.LngLat;
 import uk.ac.ed.inf.Navigation.Navigator;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,6 +37,9 @@ public class Model {
         validOrders.forEach(x -> x.findRestaurant(restaurants).addOrder(x));
         setDistances();
         sortRestaurantsByDistance();
+        System.out.println(restaurants.stream()
+                .map(p -> Double.toString(p.getTripDistance()))
+                .collect(Collectors.joining(" ")));
         Navigator drone = new Navigator(noFlyZones);
         boolean done = false;
         for (Restaurant restaurant : restaurants) {
@@ -49,8 +49,7 @@ public class Model {
             var ordersToRestaurant = restaurant.getOrdersToRestaurant();
             for (Order order : ordersToRestaurant) {
                 try {
-                    drone.navigateTo(restaurant.getCoordinates(), order.getOrderNo());
-                    drone.navigateTo(drone.APPLETON, order.getOrderNo());
+                    drone.navigateLoop(restaurant.getCoordinates(), order.getOrderNo());
                     order.setOutcome(Outcome.Delivered);
                 } catch (MoveLimitReachedException e) {
                     done = true;
@@ -59,6 +58,10 @@ public class Model {
             }
         }
         System.out.println(validOrders.stream().filter(x -> x.getOutcome() == Outcome.Delivered).count());
+        System.out.println(orders.size());
+        System.out.println(validOrders.size());
+        Output.createDeliveriesJSON(orders, date);
+        Output.createFlightpathJSON(drone.getMoves(), date);
         Output.createGeoJSON(drone.getVisited());
     }
 
@@ -79,12 +82,11 @@ public class Model {
         for (Restaurant restaurant : restaurants) {
             Navigator navigator = new Navigator(noFlyZones);
             try {
-                var distanceFromAT = navigator.
-                        navigateTo(restaurant.getCoordinates(), "").size();
-                restaurant.setDistanceFromAT(distanceFromAT);
+                navigator.navigateLoop(restaurant.getCoordinates(), "");
+                restaurant.setTripDistance(navigator.getVisited().size());
             } catch (MoveLimitReachedException e) {
                 // in case the restaurant is unreachable from AT
-                restaurant.setDistanceFromAT(-1); // negative distance means unreachable
+                restaurant.setTripDistance(-1); // negative distance means unreachable
             }
         }
     }
