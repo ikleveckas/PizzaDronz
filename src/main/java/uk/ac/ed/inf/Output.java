@@ -1,6 +1,9 @@
 package uk.ac.ed.inf;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mapbox.geojson.*;
 import uk.ac.ed.inf.Navigation.LngLat;
@@ -61,6 +64,22 @@ public class Output {
             System.err.println("Could not write into a file.");
             e.printStackTrace();
             System.exit(2);
+        }
+    }
+
+
+    private class ListSerializer<T> extends JsonSerializer<List<T>> {
+
+        @Override
+        public void serialize(List<T> items, JsonGenerator jsonGenerator,
+                              SerializerProvider serializerProvider) throws IOException {
+            jsonGenerator.writeStartArray();
+            for (T item : items) {
+                jsonGenerator.writeStartObject();
+                jsonGenerator.writeObjectField("item", item);
+                jsonGenerator.writeEndObject();
+            }
+            jsonGenerator.writeEndArray();
         }
     }
 }

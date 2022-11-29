@@ -130,6 +130,20 @@ public class VisibilityGraph {
         return result;
     }
 
+    private boolean centralAreaCrossingOnce(Edge edge, LngLat start,
+                                            Area centralArea) {
+        // need to check
+        var areas = new ArrayList<Area>();
+        areas.add(centralArea);
+        if (start.inCentralArea() && !edge.a().inCentralArea()) {
+            return visible(edge, areas);
+        } else if (!start.inCentralArea() && edge.a().inCentralArea()) {
+            return visible(edge, areas);
+        } else {
+            return true;
+        }
+    }
+
     public static boolean visible(Edge visibilityLine, List<Area> areas) { // need to think where to place this
         for (Area area : areas) {
             for (Edge e: area.getEdges()) {
