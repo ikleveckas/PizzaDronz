@@ -1,13 +1,6 @@
 package uk.ac.ed.inf;
 
-import uk.ac.ed.inf.Navigation.Area;
-import uk.ac.ed.inf.Navigation.LngLat;
-import uk.ac.ed.inf.Navigation.Navigator;
-
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Main class.
@@ -63,8 +56,8 @@ public class App {
                 new URL("https://ilp-rest.azurewebsites.net/"), "2023-04-24");
 */
 
-        Model model = new Model("2023-01-14");
-        model.processOrders();
+        OrderProcessor orderProcessor = new OrderProcessor(args[0], args[1]);
+        orderProcessor.processOrders();
 
 
 /*

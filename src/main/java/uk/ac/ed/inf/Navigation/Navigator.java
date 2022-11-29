@@ -1,6 +1,9 @@
 package uk.ac.ed.inf.Navigation;
 
 import uk.ac.ed.inf.Exceptions.MoveLimitReachedException;
+import uk.ac.ed.inf.Order;
+import uk.ac.ed.inf.Outcome;
+import uk.ac.ed.inf.Restaurant;
 
 import java.util.*;
 
@@ -37,14 +40,15 @@ public class Navigator { // maybe change it into singleton
     }
 
     private void hover(String orderNo) throws MoveLimitReachedException {
-        movesLeft -= 1;
         if (movesLeft <= 0) {
             throw new MoveLimitReachedException();
         }
+        movesLeft -= 1;
         movesSinceAT.add(new Move(orderNo, dronePosition.lng(),
                 dronePosition.lat(), Direction.HOVER.ANGLE,
                 dronePosition.lng(), dronePosition.lat(),
                 ticksSinceStartOfCalculation));
+        //visitedSinceAT.add(dronePosition); ??????????????
     }
     public void navigateLoop(LngLat end, String orderNo)
         throws MoveLimitReachedException {
@@ -58,7 +62,26 @@ public class Navigator { // maybe change it into singleton
             visitedSinceAT = new ArrayList<>();
     }
 
-    public void navigateTo(LngLat end, String orderNo)
+    public void deliverOrders(List<Restaurant> orderedRestaurants) {
+        var done = false;
+        for (Restaurant restaurant : orderedRestaurants) {
+            if (done) {
+                break;
+            }
+            var ordersToRestaurant = restaurant.getOrdersToRestaurant();
+            for (Order order : ordersToRestaurant) {
+                try {
+                    navigateLoop(restaurant.getCoordinates(), order.getOrderNo());
+                    order.setOutcome(Outcome.Delivered);
+                } catch (MoveLimitReachedException e) {
+                    done = true;
+                    break;
+                }
+            }
+        }
+
+    }
+    public List<LngLat> navigateTo(LngLat end, String orderNo)
             throws MoveLimitReachedException {
 
         var visibilityGraph = new VisibilityGraph(noFlyAreas, dronePosition, end);
@@ -84,6 +107,7 @@ public class Navigator { // maybe change it into singleton
                 visitedSinceAT.add(dronePosition);
             }
         }
+        return visitedSinceAT;
     }
 
     private Direction chooseBestDirection(LngLat start, LngLat end) {

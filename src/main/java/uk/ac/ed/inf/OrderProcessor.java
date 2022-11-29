@@ -10,9 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Model {
-    // get date
-    // process orders
+public class OrderProcessor {
     private String date;
     private List<Order> orders;
     private List<Order> validOrders;
@@ -20,14 +18,20 @@ public class Model {
     private List<Area> noFlyZones;
 
 
-    public final URL BASE_URL = makeURL("https://ilp-rest.azurewebsites.net/");
-    public Model(String date) {
-        this.date = date; // should validate date
+    public URL baseUrl;
+    public OrderProcessor(String date, String baseUrl) {
+        if (CreditCardValidation.validDateISO(date)) {
+            this.date = date; // should validate date
+        } else {
+            System.err.println("Could not assign given date.");
+            System.exit(2);
+        }
+        this.baseUrl = makeURL(baseUrl);
         orders = Arrays.stream(
-                Order.getOrdersFromRestServer(BASE_URL, date)).toList();
+                Order.getOrdersFromRestServer(this.baseUrl, date)).toList();
         restaurants = Arrays.stream(
-                Restaurant.getRestaurantsFromRestServer(BASE_URL)).toList();
-        noFlyZones = Area.getNoFlyZones(BASE_URL);
+                Restaurant.getRestaurantsFromRestServer(this.baseUrl)).toList();
+        noFlyZones = Area.getNoFlyZones(this.baseUrl);
     }
 
     public void processOrders() {
@@ -36,27 +40,8 @@ public class Model {
                 filter(x -> x.getOutcome() == Outcome.ValidButNotDelivered).toList();
         validOrders.forEach(x -> x.findRestaurant(restaurants).addOrder(x));
         setDistances();
-        sortRestaurantsByDistance();
-        System.out.println(restaurants.stream()
-                .map(p -> Double.toString(p.getTripDistance()))
-                .collect(Collectors.joining(" ")));
         Navigator drone = new Navigator(noFlyZones);
-        boolean done = false;
-        for (Restaurant restaurant : restaurants) {
-            if (done) {
-                break;
-            }
-            var ordersToRestaurant = restaurant.getOrdersToRestaurant();
-            for (Order order : ordersToRestaurant) {
-                try {
-                    drone.navigateLoop(restaurant.getCoordinates(), order.getOrderNo());
-                    order.setOutcome(Outcome.Delivered);
-                } catch (MoveLimitReachedException e) {
-                    done = true;
-                    break;
-                }
-            }
-        }
+        drone.deliverOrders(sortRestaurantsByDistance(restaurants));
         System.out.println(validOrders.stream().filter(x -> x.getOutcome() == Outcome.Delivered).count());
         System.out.println(orders.size());
         System.out.println(validOrders.size());
@@ -74,7 +59,7 @@ public class Model {
             System.err.println("Could not assign the default Rest server URL.");
             e.printStackTrace();
             System.exit(2);
-            return null;
+            return null; // will not be reached
         }
     }
 
@@ -82,8 +67,8 @@ public class Model {
         for (Restaurant restaurant : restaurants) {
             Navigator navigator = new Navigator(noFlyZones);
             try {
-                navigator.navigateLoop(restaurant.getCoordinates(), "");
-                restaurant.setTripDistance(navigator.getVisited().size());
+                var trip = navigator.navigateTo(restaurant.getCoordinates(), "");
+                restaurant.setTripDistance(trip.size());
             } catch (MoveLimitReachedException e) {
                 // in case the restaurant is unreachable from AT
                 restaurant.setTripDistance(-1); // negative distance means unreachable
@@ -92,7 +77,8 @@ public class Model {
     }
 
 
-    private void sortRestaurantsByDistance() {
-        restaurants = restaurants.stream().sorted(Restaurant::compareTo).collect(Collectors.toList());
+    private List<Restaurant> sortRestaurantsByDistance(List<Restaurant> restaurantList) {
+        return restaurantList.stream()
+                .sorted(Restaurant::compareTo).collect(Collectors.toList());
     }
 }

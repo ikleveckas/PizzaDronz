@@ -82,7 +82,7 @@ public class CreditCardValidation {
 
 
 
-    private static boolean expired(String date, String orderDate) { // MIGHT NEED TO CHANGE FROM NOW TO ORDER DATE
+    private static boolean expired(String date, String orderDate) {
         SimpleDateFormat creditCardFormat = new SimpleDateFormat("MM/yy");
         creditCardFormat.setLenient(false);
         SimpleDateFormat isoFormat = new SimpleDateFormat("yy-MM-dd");
@@ -93,11 +93,22 @@ public class CreditCardValidation {
             // expiration on last day of the month
             var finalExpiration = LocalDate.ofInstant(tempExpiryDate.toInstant(),
                     ZoneId.systemDefault()).plusMonths(1);
-            var finalOrderDate = LocalDate.ofInstant(tempExpiryDate.toInstant(),
+            var finalOrderDate = LocalDate.ofInstant(tempOrderDate.toInstant(),
                     ZoneId.systemDefault());
-            return finalExpiration.isBefore(finalOrderDate);
+            return finalExpiration.isBefore(finalOrderDate); // then expired
         } catch (ParseException p) {
             return true; // all invalid dates are treated as expired
+        }
+    }
+
+    public static boolean validDateISO(String isoDate) {
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yy-MM-dd");
+        isoFormat.setLenient(false);
+        try {
+            var date = isoFormat.parse(isoDate);
+            return true;
+        } catch (ParseException e) {
+            return false;
         }
     }
 
