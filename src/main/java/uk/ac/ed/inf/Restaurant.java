@@ -11,38 +11,51 @@ import java.util.List;
  * Represents a restaurant that can provide pizzas to the PizzaDronz service.
  */
 public class Restaurant {
-    private String name; // name of the restaurant
     private LngLat coordinates; // coordinates of the restaurant
     private Menu[] menu; // menu entries of the restaurant
-    private double tripDistance; // used for sorting purpose
+    private double distanceFromAT; // used for sorting purpose
     private List<Order> ordersToRestaurant;
-    public Restaurant(@JsonProperty("name") String name,
-                      @JsonProperty("longitude") double longitude,
+
+    /**
+     * Constructs a restaurant object.
+     * @param longitude the longitude coordinate of a restaurant.
+     * @param latitude the latitude coordinate of a restaurant.
+     * @param menu the menu entries in the restaurant.
+     */
+    public Restaurant(@JsonProperty("longitude") double longitude,
                       @JsonProperty("latitude") double latitude,
                       @JsonProperty("menu") Menu[] menu) {
-        this.name = name;
         this.coordinates = new LngLat(longitude, latitude);
         this.menu = menu;
-        tripDistance = -1; // start with unreachable, will be updated later
+        distanceFromAT = -1; // start with unreachable, will be updated later
         ordersToRestaurant = new ArrayList<>();
     }
 
+    /**
+     * Adds a given order to this restaurant.
+     * @param order an order to add to this restaurant order list.
+     */
     public void addOrder(Order order) {
         ordersToRestaurant.add(order);
     }
 
+    /**
+     * @return the list of orders that are made to this restaurant.
+     */
     public List<Order> getOrdersToRestaurant() {
         return ordersToRestaurant;
     }
 
-    public double getTripDistance() {
-        return tripDistance;
+    /**
+     * @param distanceFromAT distance from Appleton tower to this restaurant.
+     */
+    public void setDistanceFromAT(double distanceFromAT) {
+        this.distanceFromAT = distanceFromAT;
     }
 
-    public void setTripDistance(double distanceFromAT) {
-        this.tripDistance = distanceFromAT;
-    }
-
+    /**
+     * @return the coordinates of this restaurant.
+     */
     public LngLat getCoordinates() {
         return coordinates;
     }
@@ -60,22 +73,23 @@ public class Restaurant {
      * @return The array of restaurants which are defined on the server.
      */
     public static Restaurant[] getRestaurantsFromRestServer(URL serverBaseAddress) {
-        return new RestClient(serverBaseAddress).deserialise("/restaurants", Restaurant[].class);
+        return new RestClient(serverBaseAddress).deserialize("/restaurants", Restaurant[].class);
     }
 
+    /**
+     * Comparator for ordering the restaurants in terms of the distance from AT.
+     * @param other restaurant to compare.
+     * @return <code>0</code> if the distance from AT is equal to the distance
+     * from AT to the other restaurant. <code>-1</code> if this restaurant is closer
+     * to AT then the other restaurant, <code>1</code> if further.
+     */
     public int compareTo(Restaurant other) {
-        if (tripDistance == -1 && other.tripDistance == -1) {
+        if (distanceFromAT == -1 && other.distanceFromAT == -1) {
             return 0;
-        } else if (tripDistance == -1) {
+        } else if (distanceFromAT == -1) {
             return 1;
-        } else if (other.tripDistance == -1) {
+        } else if (other.distanceFromAT == -1) {
             return -1;
-        } else if (tripDistance < other.tripDistance) {
-            return -1;
-        } else if (tripDistance == other.tripDistance) {
-            return 0;
-        } else {
-            return 1;
-        }
+        } else return Double.compare(distanceFromAT, other.distanceFromAT);
     }
 }

@@ -6,25 +6,35 @@ import uk.ac.ed.inf.Navigation.Navigator;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Logic for processing the orders for the given day.
+ */
 public class OrderProcessor {
     private String date;
-    private List<Order> orders;
-    private List<Order> validOrders;
-    private List<Restaurant> restaurants; // decide between array and list
-    private List<Area> noFlyZones;
-
-
+    private final List<Order> orders;
+    private final List<Restaurant> restaurants;
+    private final List<Area> noFlyZones;
     public URL baseUrl;
-    public OrderProcessor(String date, String baseUrl) {
-        if (CreditCardValidation.validDateISO(date)) {
-            this.date = date; // should validate date
+
+    /**
+     * Constructs the <code>OrderProcessor</code> object and validates
+     * the command line input.
+     * @param date the date for which the orders should be processed.
+     * @param baseUrl the base URL address of the Rest server.
+     */
+    public OrderProcessor(String date, String baseUrl) throws IllegalArgumentException{
+        if (validDateISO(date)) {
+            this.date = date;
         } else {
-            System.err.println("Could not assign given date.");
-            System.exit(2);
+            throw new IllegalArgumentException("The given arguments are invalid");
+            //System.err.println("Could not assign given date.");
+            //System.exit(2);
         }
         this.baseUrl = makeURL(baseUrl);
         orders = Arrays.stream(
@@ -34,9 +44,13 @@ public class OrderProcessor {
         noFlyZones = Area.getNoFlyZones(this.baseUrl);
     }
 
+    /**
+     * Processes orders for the given day while aiming to maximise the
+     * number of deliveries for valid orders.
+     */
     public void processOrders() {
         orders.forEach(x -> x.validateOrder(restaurants));
-        validOrders = orders.stream().
+        List<Order> validOrders = orders.stream().
                 filter(x -> x.getOutcome() == Outcome.ValidButNotDelivered).toList();
         validOrders.forEach(x -> x.findRestaurant(restaurants).addOrder(x));
         setDistances();
@@ -47,10 +61,8 @@ public class OrderProcessor {
         System.out.println(validOrders.size());
         Output.createDeliveriesJSON(orders, date);
         Output.createFlightpathJSON(drone.getMoves(), date);
-        Output.createGeoJSON(drone.getVisited());
+        Output.createGeoJSON(drone.getVisited(), date);
     }
-
-
 
     private URL makeURL(String string) {
         try {
@@ -68,10 +80,10 @@ public class OrderProcessor {
             Navigator navigator = new Navigator(noFlyZones);
             try {
                 var trip = navigator.navigateTo(restaurant.getCoordinates(), "");
-                restaurant.setTripDistance(trip.size());
+                restaurant.setDistanceFromAT(trip.size());
             } catch (MoveLimitReachedException e) {
                 // in case the restaurant is unreachable from AT
-                restaurant.setTripDistance(-1); // negative distance means unreachable
+                restaurant.setDistanceFromAT(-1); // negative distance means unreachable
             }
         }
     }
@@ -80,5 +92,16 @@ public class OrderProcessor {
     private List<Restaurant> sortRestaurantsByDistance(List<Restaurant> restaurantList) {
         return restaurantList.stream()
                 .sorted(Restaurant::compareTo).collect(Collectors.toList());
+    }
+
+    private boolean validDateISO(String isoDate) {
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yy-MM-dd");
+        isoFormat.setLenient(false);
+        try {
+            isoFormat.parse(isoDate);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
     }
 }

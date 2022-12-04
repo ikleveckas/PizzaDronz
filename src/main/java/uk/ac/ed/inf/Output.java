@@ -15,24 +15,38 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Contains the methods for generating output.
+ */
 public class Output {
-    public static void createGeoJSON(List<LngLat> lngLats){
+    /**
+     * Creates a GeoJSON file that contains the drone flightpath.
+     * @param lngLats the drone flightpath.
+     * @param date the date to be included in the file name.
+     */
+    public static void createGeoJSON(List<LngLat> lngLats, String date){
         List<Point> points = new ArrayList<>();
+        var title = "drone-" + date + ".geojson";
         for (LngLat lngLat : lngLats) {
             points.add(Point.fromLngLat(lngLat.lng(), lngLat.lat())); // check for exception
         }
         Geometry geometry = LineString.fromLngLats(points);
         Feature feature = Feature.fromGeometry(geometry);
         FeatureCollection featureCollection = FeatureCollection.fromFeature(feature);
-        writeToFile(featureCollection.toJson(), "output.geojson");
+        writeToFile(featureCollection.toJson(), title);
     }
 
+    /**
+     * Creates a JSON file that contains the outcomes for each order.
+     * @param orders the list of orders to be written.
+     * @param date the date to be included in the file name.
+     */
     public static void createDeliveriesJSON(
             @JsonSerialize(contentUsing = ListSerializer.class) List<Order> orders,
             String date) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            String title = "deliveries-" + date + ".json";
+            var title = "deliveries-" + date + ".json";
             File myFile = new File(title);
             objectMapper.writer().writeValue(myFile, orders);
         } catch (Exception e) {
@@ -41,13 +55,19 @@ public class Output {
         }
     }
 
+    /**
+     * Creates a JSON file that contains the drone flightpath in moves.
+     * @param moves the list of moves the drone took.
+     * @param date the date to be included in the file name.
+     */
     public static void createFlightpathJSON(
             @JsonSerialize(contentUsing = ListSerializer.class) List<Move> moves,
             String date) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            String title = "flightpath-" + date + ".json";
+            var title = "flightpath-" + date + ".json";
             File myFile = new File(title);
+            moves.forEach(Move::setTicksSinceStartOfCalculation);
             objectMapper.writer().writeValue(myFile, moves);
         } catch (Exception e) {
             System.err.println("A problem occurred while writing to a file");
@@ -67,9 +87,12 @@ public class Output {
         }
     }
 
+    private static final class ListSerializer<T> extends JsonSerializer<List<T>> {
 
-    private class ListSerializer<T> extends JsonSerializer<List<T>> {
 
+        /**
+         * Serialises the given list of items into a JSON array of records.
+         */
         @Override
         public void serialize(List<T> items, JsonGenerator jsonGenerator,
                               SerializerProvider serializerProvider) throws IOException {

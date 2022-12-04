@@ -2,23 +2,38 @@ package uk.ac.ed.inf;
 
 import uk.ac.ed.inf.Exceptions.InvalidCardNoException;
 import uk.ac.ed.inf.Exceptions.InvalidCvvException;
-import uk.ac.ed.inf.Exceptions.InvalidExpiryDateException;
-
+import uk.ac.ed.inf.Exceptions.InvalidCreditCardExpiryException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
+/**
+ * Logic for credit card validation.
+ */
 public class CreditCardValidation {
-    // Need to think about exceptions!
+    /**
+     * Confirms that the credit card details are valid, otherwise
+     * throws an appropriate exception.
+     * Currently supports Visa and Mastercard credit cards.
+     * @param cardNo the 16 digit credit card number.
+     * @param expiryDate the expiry date in MM/YY format.
+     * @param cvv the 3 digit cvv number.
+     * @param orderDate the date of an order for checking expiration.
+     * @return <code>true</code> if the credit card is valid.
+     * @throws InvalidCardNoException if the credit card number is invalid.
+     * @throws InvalidCreditCardExpiryException if the credit card expiration
+     * is invalid.
+     * @throws InvalidCvvException if the credit card cvv number is invalid.
+     */
     public static boolean validateCreditCard(String cardNo, String expiryDate,
                                              String cvv, String orderDate)
             throws InvalidCardNoException,
-            InvalidExpiryDateException, InvalidCvvException {
+            InvalidCreditCardExpiryException, InvalidCvvException {
         if (!validCardNo(cardNo)) {
             throw new InvalidCardNoException();
         } else if (expired(expiryDate, orderDate)) {
-            throw new InvalidExpiryDateException();
+            throw new InvalidCreditCardExpiryException();
         } else if (!validCvv(cvv)) {
             throw new InvalidCvvException();
         }
@@ -32,23 +47,18 @@ public class CreditCardValidation {
                 && (isVisa(cardNo) || isMastercard(cardNo));
     }
     private static boolean checkLuhn(String cardNo) {
-        int nDigits = cardNo.length();
-
-        int nSum = 0;
-        boolean isSecond = false;
+        // Algorithm from https://www.geeksforgeeks.org/luhn-algorithm/
+        var nDigits = cardNo.length();
+        var nSum = 0;
+        var isSecond = false;
         for (int i = nDigits - 1; i >= 0; i--) {
-
-            int d = cardNo.charAt(i) - '0';
-
-            if (isSecond == true)
+            var d = cardNo.charAt(i) - '0';
+            if (isSecond == true) {
                 d = d * 2;
-
-            // We add two digits to handle
-            // cases that make two digits
-            // after doubling
+            }
+            // Add two digits to handle cases that make two digits after doubling
             nSum += d / 10;
             nSum += d % 10;
-
             isSecond = !isSecond;
         }
         return (nSum % 10 == 0);
@@ -70,10 +80,10 @@ public class CreditCardValidation {
                     || cardNo.charAt(1) == '4'
                     || cardNo.charAt(1) == '5');
             try {
-                var second = Integer.parseInt(cardNo.substring(0, 4)); // maybe no need to parse
+                var second = Integer.parseInt(cardNo.substring(0, 4));
                 return first || (second >= 2221 && second <= 2720);
             } catch (Exception e) {
-                return false;
+                return false; // if the credit card number cannot be parsed it's invalid.
             }
         }
 
@@ -98,17 +108,6 @@ public class CreditCardValidation {
             return finalExpiration.isBefore(finalOrderDate); // then expired
         } catch (ParseException p) {
             return true; // all invalid dates are treated as expired
-        }
-    }
-
-    public static boolean validDateISO(String isoDate) {
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yy-MM-dd");
-        isoFormat.setLenient(false);
-        try {
-            var date = isoFormat.parse(isoDate);
-            return true;
-        } catch (ParseException e) {
-            return false;
         }
     }
 

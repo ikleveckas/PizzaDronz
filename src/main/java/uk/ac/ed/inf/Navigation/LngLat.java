@@ -20,34 +20,11 @@ public record LngLat(@JsonProperty("longitude") double lng,
     // represent different things. Also, it is easier to change them
     // if needed in the future, since now there is a clear separation.
     public static final double CLOSE = 0.00015;
-    public static final double STEP = 0.00015;
-
-    /**
-     * Checks if this point is within the Central area.
-     * Border and corner values are included in the Central area.
-     * @return <code>true</code> if this point is within the Central area;
-     * <code>false</code> if the point is not in the Central area or
-     * if the Central area coordinates cannot be retrieved from the server.
-     */
-
-    public boolean inCentralArea() {
-        // The Central area coordinates are accessed using the default REST-service URL.
-        // Default URL is represented by null.
-        var centralArea = CentralArea.getInstance().getCoordinates(null);
-        // avoid null pointer exception if the central area is not retrieved
-        if (centralArea != null) {
-            return (onCorner(centralArea) ||
-                    onBoundary(centralArea) ||
-                    strictlyInsideArea(List.of(centralArea)));
-        } else {
-            return false;
-        }
-    }
+    public static final double MOVE_DISTANCE = 0.00015;
 
     /**
      * Checks if this point is inside the given area boundaries.
      * If the point is on the boundary, it is classified as either inside or outside.
-     *
      * The idea has been adapted from:
      * <a href="http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html">
      *     http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html</a>
@@ -77,24 +54,6 @@ public record LngLat(@JsonProperty("longitude") double lng,
     }
 
     /**
-     * Checks if this point is on one of the polygon edges.
-     * @param corners the coordinates of the polygon corners.
-     * @return <code>true</code> if this point lies on any of the polygon edges;
-     * <code>false</code> otherwise.
-     */
-    private boolean onBoundary(LngLat[] corners) {
-        // Check if the point is between two neighbouring corners
-        for (int i = 0; i < corners.length - 1; i++) {
-            if (pointBetweenCorners(corners[i], corners[i + 1])) {
-                return true;
-            }
-        }
-        // Finally check if the point is between the first and the last corners
-        return pointBetweenCorners(corners[corners.length - 1],
-                corners[0]);
-    }
-
-    /**
      * Checks is this point lies on the line strictly between the two given points.
      * @param corner1 first ending of the line.
      * @param corner2 second ending of the line.
@@ -108,27 +67,20 @@ public record LngLat(@JsonProperty("longitude") double lng,
                 && !equals(corner2);
     }
 
+    /**
+     * Checks if the other LngLat object has equal coordinates to this
+     * LngLat object.
+     * @param other the other LngLat object.
+     * @return <code>true</code> if the other LngLat object has equal
+     * coordinates, <code>false</code> otherwise.
+     */
     public boolean equals(LngLat other) {
         return lng == other.lng && lat == other.lat;
     }
 
     /**
-     * Checks if this point coordinates match any of the given points.
-     * @param corners the coordinates of the polygon corners.
-     * @return <code>true</code> if the point coordinates match any of the given points;
-     * <code>false</code> otherwise.
-     */
-    private boolean onCorner(LngLat[] corners) {
-        for (int i = 0; i < corners.length; i++) {
-            if (lng == corners[i].lng && lat == corners[i].lat) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Calculates the Pythagorean distance between this point and the given point.
+     * Calculates the Pythagorean distance between this point and
+     * the given point.
      * @param other the point to calculate the distance to.
      * @return Pythagorean distance in degrees to the given point.
      */
@@ -159,30 +111,10 @@ public record LngLat(@JsonProperty("longitude") double lng,
         if (direction == HOVER) { // Hovering does not change the coordinates
             return new LngLat(lng, lat);
         } else {
-            double angleInRad = Math.toRadians(direction.ANGLE.doubleValue());
-            double newLng = lng + STEP * Math.cos(angleInRad);
-            double newLat = lat + STEP * Math.sin(angleInRad);
+            double angleInRad = Math.toRadians(direction.ANGLE);
+            double newLng = lng + MOVE_DISTANCE * Math.cos(angleInRad);
+            double newLat = lat + MOVE_DISTANCE * Math.sin(angleInRad);
             return new LngLat(newLng, newLat);
         }
-    }
-
-    public static boolean intersect(LngLat a1, LngLat a2, LngLat b1, LngLat b2) {
-        // maybe move to edge
-        var det = (a2.lng - a1.lng) * (b2.lat - b1.lat)
-                - (b2.lng - b1.lng) * (a2.lat - a1.lat);
-        if (det == 0) {
-            return false;
-        } else {
-            var lambda = ((b2.lat - b1.lat) * (b2.lng - a1.lng)
-                    + (b1.lng - b2.lng) * (b2.lat - a1.lat)) / det;
-            var gamma = ((a1.lat - a2.lat) * (b2.lng - a1.lng)
-                    + (a2.lng - a1.lng) * (b2.lat - a1.lat)) / det;
-            return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
-        }
-    }
-
-
-    public LngLat copy() {
-        return new LngLat(lng, lat);
     }
 }

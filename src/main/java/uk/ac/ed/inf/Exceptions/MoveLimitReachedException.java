@@ -1,8 +1,10 @@
 package uk.ac.ed.inf.Exceptions;
 
-// ASK ABOUT THIS
+/**
+ * Exception used when the drone battery is exhausted
+ */
 public class MoveLimitReachedException extends Exception{
     public MoveLimitReachedException() {
-        super();
+        super("Move limit reached.");
     }
 }

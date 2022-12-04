@@ -1,7 +1,5 @@
 package uk.ac.ed.inf;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.ac.ed.inf.Exceptions.*;
 
@@ -17,16 +15,26 @@ public class Order{
     public static final int MIN_PIZZA_COUNT = 1;
     public static final int MAX_PIZZA_COUNT = 4;
 
-    private String orderNo;
-    private String orderDate;
-    private String creditCardNumber;
-    private String creditCardExpiry;
-    private String cvv;
-    private int priceTotalInPence;
-    private String[] orderItems;
+    private final String orderNo;
+    private final String orderDate;
+    private final String creditCardNumber;
+    private final String creditCardExpiry;
+    private final String cvv;
+    private final int priceTotalInPence;
+    private final String[] orderItems;
 
     private Outcome outcome;
 
+    /**
+     * Constructs an order object.
+     * @param orderNo {@link #getOrderNo()}
+     * @param orderDate the date of an order.
+     * @param creditCardNumber the 16 digit credit card number.
+     * @param creditCardExpiry the credit card expiry date in MM/YY format.
+     * @param cvv the credit card 3 digit cvv number.
+     * @param priceTotalInPence the total price of an order in pence.
+     * @param orderItems the pizzas included in this order.
+     */
     public Order (@JsonProperty("orderNo") String orderNo,
                   @JsonProperty("orderDate") String orderDate,
                   @JsonProperty("creditCardNumber") String creditCardNumber,
@@ -44,45 +52,28 @@ public class Order{
         outcome = Outcome.ValidButNotDelivered;// default
     }
 
-    @JsonIgnore
-    public String[] getOrderItems() {
-        return orderItems;
-    }
-
-    public int getPriceTotalInPence() {
-        return priceTotalInPence;
-    }
-    @JsonIgnore
-    public String getCreditCardNumber() {
-        return creditCardNumber;
-    }
-
-    @JsonIgnore
-    public String getCvv() {
-        return cvv;
-    }
-
-    @JsonIgnore
-    public String getOrderDate() {
-        return orderDate;
-    }
-
-    @JsonIgnore
-    public String getCreditCardExpiry() {
-        return creditCardExpiry;
-    }
-
+    /**
+     * @return the eight-character order number for the pizza order which
+     * the drone is currently collecting or delivering
+     */
     public String getOrderNo() {
         return orderNo;
     }
 
+    /**
+     * @return {@link #setOutcome(Outcome)}
+     */
     public Outcome getOutcome() {
         return outcome;
     }
 
+    /**
+     * @param outcome the outcome of this order.
+     */
     public void setOutcome(Outcome outcome) {
         this.outcome = outcome;
     }
+
     /**
      * Calculates the <code>int</code> cost in pence of having
      * a valid pizza combination delivered by drone.
@@ -104,12 +95,11 @@ public class Order{
         if (!allPizzasExist(restaurants, orderItems)) {
             throw new InvalidPizzaNotDefinedException();
         }
-        findRestaurant(restaurants);
         var restaurant = findRestaurant(restaurants);
-        if (restaurant == null) { // If no restaurant has the requested pizza combination
+        if (restaurant == null) { // If no restaurant has all requested pizzas
             throw new InvalidPizzaCombinationException();
         } else { // Otherwise sum the pizza costs and add 100 pence for each pizza
-            var menu = restaurant.getMenu();
+            var menu = restaurant.getMenu(); // restaurant has all pizzas
             return Arrays.stream(orderItems)
                     .reduce(DELIVERY_CHARGE, (subtotal, element) -> subtotal
                             + Arrays.stream(menu)
@@ -118,24 +108,14 @@ public class Order{
         }
     }
 
-
     /**
-     * Finds the menu of a restaurant, which contains the requested pizza combination.
-     * @param restaurants participating restaurants, including their menus.
-     * @param pizzas individual pizzas ordered.
-     * @return the menus of a restaurant that can serve the requested pizza combination.
+     * Finds the restaurant which has first pizza of this order.
+     * Using the fact that no two restaurants have the first pizza.
+     * @param restaurants the available list of restaurants.
+     * @return the restaurant which contains the first pizza,
+     * <code>null</code> if no restaurant contains the first pizza.
      */
-    private Menu[] findMenu(Restaurant[] restaurants,
-                            String[] pizzas)
-    {
-        // restaurant can also not be found
-        //return restaurant.getMenu();
-        return null;
-    }
-
     public Restaurant findRestaurant(List<Restaurant> restaurants) {
-        // Find the restaurant which has first pizza
-        // Using the fact that no two restaurants have the first pizza
         var restaurant = restaurants.stream()
                 .filter(x -> Arrays.stream(x.getMenu())
                         .anyMatch(y -> y.name().equals(orderItems[0])))
@@ -149,13 +129,6 @@ public class Order{
         }
     }
 
-    /**
-     * Checks that the given menus contain the requested pizza combination.
-     * @param menu given menus that should contain the requested pizza combination.
-     * @param pizzas individual pizzas ordered
-     * @return <code>true</code> if the menus can satisfy the requested pizza combination;
-     * <code>false</code> otherwise.
-     */
     private boolean allPizzasInMenu(Menu[] menu,
                                     String[] pizzas) {
         // Check if all pizzas' names match some menu item name.
@@ -181,10 +154,22 @@ public class Order{
         }
         return true;
     }
-    static Order[] getOrdersFromRestServer(URL baseAddress, String date) {
-        return new RestClient(baseAddress).deserialise("/orders", date, Order[].class);
+
+    /**
+     * Collects orders defined in the Rest server into one array.
+     * @param baseAddress the base address of the server.
+     * @param date the date for which the orders are collected.
+     * @return The array of orders for the given day listed on the Rest server.
+     */
+    public static Order[] getOrdersFromRestServer(URL baseAddress, String date) {
+        return new RestClient(baseAddress)
+                .deserialize("/orders", date, Order[].class);
     }
 
+    /**
+     * Validates the order and sets the appropriate outcome.
+     * @param restaurants the available list of restaurants.
+     */
     public void validateOrder(List<Restaurant> restaurants) {
         try {
             var calculatedPrice = getDeliveryCost(restaurants);
@@ -203,7 +188,7 @@ public class Order{
             outcome = Outcome.InvalidPizzaNotDefined;
         } catch (InvalidCardNoException e) {
             outcome = Outcome.InvalidCardNumber;
-        } catch (InvalidExpiryDateException e) {
+        } catch (InvalidCreditCardExpiryException e) {
             outcome = Outcome.InvalidExpiryDate;
         } catch (InvalidCvvException e) {
             outcome = Outcome.InvalidCvv;
