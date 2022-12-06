@@ -1,0 +1,31 @@
+-------------------------------------------------------------------------------
+Test set: uk.ac.ed.inf.NextPositionTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 4, Skipped: 0, Time elapsed: 0.002 sec <<< FAILURE!
+testEast(uk.ac.ed.inf.NextPositionTest)  Time elapsed: 0 sec  <<< ERROR!
+java.lang.NoClassDefFoundError: uk/ac/ed/inf/LngLat
+	at uk.ac.ed.inf.NextPositionTest.testEast(NextPositionTest.java:30)
+Caused by: java.lang.ClassNotFoundException: uk.ac.ed.inf.LngLat
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:521)
+	... 23 more
+
+testSswMany(uk.ac.ed.inf.NextPositionTest)  Time elapsed: 0 sec  <<< ERROR!
+java.lang.NoClassDefFoundError: uk/ac/ed/inf/LngLat
+	at uk.ac.ed.inf.NextPositionTest.testSswMany(NextPositionTest.java:51)
+Caused by: java.lang.ClassNotFoundException: uk.ac.ed.inf.LngLat
+	... 23 more
+
+testNorth(uk.ac.ed.inf.NextPositionTest)  Time elapsed: 0 sec  <<< ERROR!
+java.lang.NoClassDefFoundError: uk/ac/ed/inf/LngLat
+	at uk.ac.ed.inf.NextPositionTest.testNorth(NextPositionTest.java:36)
+Caused by: java.lang.ClassNotFoundException: uk.ac.ed.inf.LngLat
+	... 23 more
+
+testNorthMany(uk.ac.ed.inf.NextPositionTest)  Time elapsed: 0 sec  <<< ERROR!
+java.lang.NoClassDefFoundError: uk/ac/ed/inf/LngLat
+	at uk.ac.ed.inf.NextPositionTest.testNorthMany(NextPositionTest.java:42)
+Caused by: java.lang.ClassNotFoundException: uk.ac.ed.inf.LngLat
+	... 23 more
+
