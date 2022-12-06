@@ -95,7 +95,7 @@ public record LngLat(@JsonProperty("longitude") double lng,
      * than the constant CLOSE defined in the specification (0.00015)
      * @param other the point to which the distance is checked
      * @return <code>true</code> if the point is within the distance tolerance
-     * defined in specification (currently close if distance < 0.00015);
+     * defined in specification (currently close if distance less than 0.00015);
      * <code>false</code> otherwise.
      */
     public boolean closeTo(LngLat other) {

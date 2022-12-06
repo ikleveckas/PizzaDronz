@@ -89,7 +89,6 @@ public class Output {
 
     private static final class ListSerializer<T> extends JsonSerializer<List<T>> {
 
-
         /**
          * Serialises the given list of items into a JSON array of records.
          */

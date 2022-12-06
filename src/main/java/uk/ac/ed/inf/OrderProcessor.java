@@ -28,13 +28,13 @@ public class OrderProcessor {
      * @param date the date for which the orders should be processed.
      * @param baseUrl the base URL address of the Rest server.
      */
-    public OrderProcessor(String date, String baseUrl) throws IllegalArgumentException{
+    public OrderProcessor(String date, String baseUrl) {
         if (validDateISO(date)) {
             this.date = date;
         } else {
-            throw new IllegalArgumentException("The given arguments are invalid");
-            //System.err.println("Could not assign given date.");
-            //System.exit(2);
+            System.err.println("The input date is invalid. Please input date in " +
+                    "YYYY-MM-DD format.");
+            System.exit(2);
         }
         this.baseUrl = makeURL(baseUrl);
         orders = Arrays.stream(
@@ -51,12 +51,12 @@ public class OrderProcessor {
     public void processOrders() {
         orders.forEach(x -> x.validateOrder(restaurants));
         List<Order> validOrders = orders.stream().
-                filter(x -> x.getOutcome() == Outcome.ValidButNotDelivered).toList();
+                filter(x -> x.getOutcome() == OrderOutcome.ValidButNotDelivered).toList();
         validOrders.forEach(x -> x.findRestaurant(restaurants).addOrder(x));
         setDistances();
         Navigator drone = new Navigator(noFlyZones);
         drone.deliverOrders(sortRestaurantsByDistance(restaurants));
-        System.out.println(validOrders.stream().filter(x -> x.getOutcome() == Outcome.Delivered).count());
+        System.out.println(validOrders.stream().filter(x -> x.getOutcome() == OrderOutcome.Delivered).count());
         System.out.println(orders.size());
         System.out.println(validOrders.size());
         Output.createDeliveriesJSON(orders, date);

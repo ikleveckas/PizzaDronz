@@ -2,7 +2,7 @@ package uk.ac.ed.inf.Navigation;
 
 /**
  * Represents the 16 different compass directions the drone can face.
- * Also contains the hovering, when there is no direction. <p></p>
+ * Also contains the hovering, when there is no direction.
  */
 public enum Direction {
 

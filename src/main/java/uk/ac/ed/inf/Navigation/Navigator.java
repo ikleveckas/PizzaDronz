@@ -1,7 +1,7 @@
 package uk.ac.ed.inf.Navigation;
 import uk.ac.ed.inf.Exceptions.MoveLimitReachedException;
 import uk.ac.ed.inf.Order;
-import uk.ac.ed.inf.Outcome;
+import uk.ac.ed.inf.OrderOutcome;
 import uk.ac.ed.inf.Restaurant;
 import java.util.*;
 
@@ -71,7 +71,7 @@ public class Navigator {
      * @throws MoveLimitReachedException if the drone does not have enough moves
      * to reach the given endpoint.
      */
-    public void navigateLoop(LngLat end, String orderNo)
+    private void navigateLoop(LngLat end, String orderNo)
         throws MoveLimitReachedException {
             navigateTo(end, orderNo);
             hover(orderNo); // hover when collecting from a restaurant
@@ -102,7 +102,7 @@ public class Navigator {
             for (Order order : ordersToRestaurant) {
                 try {
                     navigateLoop(restaurant.getCoordinates(), order.getOrderNo());
-                    order.setOutcome(Outcome.Delivered);
+                    order.setOutcome(OrderOutcome.Delivered);
                 } catch (MoveLimitReachedException e) {
                     outOfBattery = true;
                     break;

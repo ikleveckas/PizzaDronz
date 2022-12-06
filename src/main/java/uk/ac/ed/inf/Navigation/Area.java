@@ -54,6 +54,7 @@ public record Area(List<LngLat> vertices) {
      */
     public static List<Area> getNoFlyZones(URL serverBaseAddress) {
         List<Area> result = new ArrayList<>();
+        // The following is used to adapt to the data format in the Rest server
         var noFlyZoneObjects = new RestClient(serverBaseAddress)
                 .deserialize("/noFlyZones", noFlyZoneObject[].class);
         try {

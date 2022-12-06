@@ -23,7 +23,7 @@ public class Order{
     private final int priceTotalInPence;
     private final String[] orderItems;
 
-    private Outcome outcome;
+    private OrderOutcome orderOutcome;
 
     /**
      * Constructs an order object.
@@ -49,7 +49,7 @@ public class Order{
         this.cvv = cvv;
         this.priceTotalInPence = priceTotalInPence;
         this.orderItems = orderItems;
-        outcome = Outcome.ValidButNotDelivered;// default
+        orderOutcome = OrderOutcome.ValidButNotDelivered;// default
     }
 
     /**
@@ -61,17 +61,17 @@ public class Order{
     }
 
     /**
-     * @return {@link #setOutcome(Outcome)}
+     * @return {@link #setOutcome(OrderOutcome)}
      */
-    public Outcome getOutcome() {
-        return outcome;
+    public OrderOutcome getOutcome() {
+        return orderOutcome;
     }
 
     /**
-     * @param outcome the outcome of this order.
+     * @param orderOutcome the outcome of this order.
      */
-    public void setOutcome(Outcome outcome) {
-        this.outcome = outcome;
+    public void setOutcome(OrderOutcome orderOutcome) {
+        this.orderOutcome = orderOutcome;
     }
 
     /**
@@ -174,24 +174,24 @@ public class Order{
         try {
             var calculatedPrice = getDeliveryCost(restaurants);
             if (calculatedPrice != priceTotalInPence) {
-                outcome = Outcome.InvalidTotal;
+                orderOutcome = OrderOutcome.InvalidTotal;
             } else if (CreditCardValidation.validateCreditCard(
                     creditCardNumber, creditCardExpiry,
                     cvv, orderDate)) {
-                outcome = Outcome.ValidButNotDelivered;
+                orderOutcome = OrderOutcome.ValidButNotDelivered;
             }
         } catch (InvalidPizzaCountException e) {
-            outcome = Outcome.InvalidPizzaCount;
+            orderOutcome = OrderOutcome.InvalidPizzaCount;
         } catch (InvalidPizzaCombinationException e) {
-            outcome = Outcome.InvalidPizzaCombinationMultipleSuppliers;
+            orderOutcome = OrderOutcome.InvalidPizzaCombinationMultipleSuppliers;
         } catch (InvalidPizzaNotDefinedException e) {
-            outcome = Outcome.InvalidPizzaNotDefined;
+            orderOutcome = OrderOutcome.InvalidPizzaNotDefined;
         } catch (InvalidCardNoException e) {
-            outcome = Outcome.InvalidCardNumber;
+            orderOutcome = OrderOutcome.InvalidCardNumber;
         } catch (InvalidCreditCardExpiryException e) {
-            outcome = Outcome.InvalidExpiryDate;
+            orderOutcome = OrderOutcome.InvalidExpiryDate;
         } catch (InvalidCvvException e) {
-            outcome = Outcome.InvalidCvv;
+            orderOutcome = OrderOutcome.InvalidCvv;
         }
     }
 

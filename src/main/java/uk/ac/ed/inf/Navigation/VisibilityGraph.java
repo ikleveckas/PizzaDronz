@@ -55,16 +55,16 @@ public class VisibilityGraph {
         }
         while (!queue.isEmpty()) { // find the shortest paths using Dijkstra
             var current = queue.poll(); // next shortest path vertex
-            if (current.key().equals(end)) {
+            if (current.vertex().equals(end)) {
                 break; // can finish if the shortest path to end is found
             }
-            for (LngLat adjacent : adjLists.get(current.key())) {
-                var alt = dist.get(current.key()) + current.key().distanceTo(adjacent);
+            for (LngLat adjacent : adjLists.get(current.vertex())) {
+                var alt = dist.get(current.vertex()) + current.vertex().distanceTo(adjacent);
                 if (alt < dist.get(adjacent)) { // update path if an alternative path is shorter
                     dist.replace(adjacent, alt);
-                    prev.replace(adjacent, current.key());
+                    prev.replace(adjacent, current.vertex());
                     // update distance to adjacent in queue
-                    queue.removeIf(x -> x.key().equals(adjacent));
+                    queue.removeIf(x -> x.vertex().equals(adjacent));
                     queue.add(new QueueEntry(adjacent, alt));
                 }
             }
@@ -127,7 +127,7 @@ public class VisibilityGraph {
         return result;
     }
 
-    private record QueueEntry(LngLat key, Double distance)
+    private record QueueEntry(LngLat vertex, Double distance)
             implements Comparable<QueueEntry> {
 
         @Override
