@@ -66,7 +66,7 @@ public class RestClient {
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             response = objectMapper.readValue(finalURL, klass);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("There was a problem accessing the server");
         }
         return response;
     }

@@ -5,6 +5,7 @@ import uk.ac.ed.inf.Navigation.LngLat;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -70,10 +71,17 @@ public class Restaurant {
     /**
      * Collects restaurants defined in the server into one array.
      * @param serverBaseAddress The base address of the server.
-     * @return The array of restaurants which are defined on the server.
+     * @return The list of restaurants which are defined on the server.
+     * If there is an error reading server data, an empty list is returned.
      */
-    public static Restaurant[] getRestaurantsFromRestServer(URL serverBaseAddress) {
-        return new RestClient(serverBaseAddress).deserialize("/restaurants", Restaurant[].class);
+    public static List<Restaurant> getRestaurantsFromRestServer(URL serverBaseAddress) {
+        var deserialisedRestaurants = new RestClient(serverBaseAddress).
+                deserialize("/restaurants", Restaurant[].class);
+        if (deserialisedRestaurants != null) {
+            return Arrays.stream(deserialisedRestaurants).toList();
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     /**

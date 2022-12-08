@@ -37,10 +37,8 @@ public class OrderProcessor {
             System.exit(2);
         }
         this.baseUrl = makeURL(baseUrl);
-        orders = Arrays.stream(
-                Order.getOrdersFromRestServer(this.baseUrl, date)).toList();
-        restaurants = Arrays.stream(
-                Restaurant.getRestaurantsFromRestServer(this.baseUrl)).toList();
+        orders = Order.getOrdersFromRestServer(this.baseUrl, date);
+        restaurants = Restaurant.getRestaurantsFromRestServer(this.baseUrl);
         noFlyZones = Area.getNoFlyZones(this.baseUrl);
     }
 
