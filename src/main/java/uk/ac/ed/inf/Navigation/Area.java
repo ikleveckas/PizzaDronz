@@ -65,8 +65,9 @@ public record Area(List<LngLat> vertices) {
                 }
                 result.add(new Area(coordinates));
             }
-        } catch (IndexOutOfBoundsException e) {
-            return new ArrayList<>(); // empty area in case data is corrupted on the server
+        } catch (NullPointerException e) {
+            // empty area in case of errors reading data from server
+            return new ArrayList<>();
         }
         return result;
     }

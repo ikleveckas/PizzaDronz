@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.ac.ed.inf.Exceptions.*;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -159,11 +160,17 @@ public class Order{
      * Collects orders defined in the Rest server into one array.
      * @param baseAddress the base address of the server.
      * @param date the date for which the orders are collected.
-     * @return The array of orders for the given day listed on the Rest server.
+     * @return The list of orders for the given day listed on the Rest server.
+     * If the orders were not found on the server, empty list is returned.
      */
-    public static Order[] getOrdersFromRestServer(URL baseAddress, String date) {
-        return new RestClient(baseAddress)
+    public static List<Order> getOrdersFromRestServer(URL baseAddress, String date) {
+        var deserialisedOrders = new RestClient(baseAddress)
                 .deserialize("/orders", date, Order[].class);
+        if (deserialisedOrders != null) {
+            return Arrays.stream(deserialisedOrders).toList();
+        } else { // case when no orders were found
+            return new ArrayList<>();
+        }
     }
 
     /**
