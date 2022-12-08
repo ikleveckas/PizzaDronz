@@ -19,8 +19,8 @@ public record LineSegment(LngLat a, LngLat b) {
     public boolean doesNotIntersectAreas(List<Area> areas) {
         for (Area area : areas) {
             for (LineSegment e: area.getEdges()) {
-                if (intersects(e) || e.a().pointBetweenCorners(a(), b())
-                        || e.b().pointBetweenCorners(a(), b())) {
+                if (e.intersects(this) || e.a().pointBetweenCorners(a, b)
+                        || e.b().pointBetweenCorners(a, b)) {
                     return false;
                 }
             }
