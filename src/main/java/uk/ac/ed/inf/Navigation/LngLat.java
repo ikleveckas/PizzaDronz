@@ -75,6 +75,9 @@ public record LngLat(@JsonProperty("longitude") double lng,
      * coordinates, <code>false</code> otherwise.
      */
     public boolean equals(LngLat other) {
+        if (other == null) {
+            return false;
+        }
         return lng == other.lng && lat == other.lat;
     }
 
@@ -116,5 +119,34 @@ public record LngLat(@JsonProperty("longitude") double lng,
             double newLat = lat + MOVE_DISTANCE * Math.sin(angleInRad);
             return new LngLat(newLng, newLat);
         }
+    }
+
+    private boolean onBoundary(Area area) {
+        List<LngLat> corners = area.vertices();
+        var noCorners = corners.toArray().length;
+        // Check if the point is between two neighbouring corners
+        for (int i = 0; i < noCorners - 1; i++) {
+            if (pointBetweenCorners(corners.get(i), corners.get(i + 1))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean onCorner(List<LngLat> corners) {
+        for (LngLat corner : corners) {
+            if (lng == corner.lng && lat == corner.lat) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public boolean inCentralArea(Area centralArea) {
+        // avoid null pointer exception if the central area is not retrieved
+        return (onCorner(centralArea.vertices()) ||
+                    onBoundary(centralArea) ||
+                    strictlyInsideArea(centralArea.vertices()));
     }
 }
