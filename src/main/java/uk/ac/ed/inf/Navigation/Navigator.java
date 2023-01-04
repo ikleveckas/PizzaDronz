@@ -73,6 +73,7 @@ public class Navigator {
      */
     private void navigateLoop(LngLat end, String orderNo)
         throws MoveLimitReachedException {
+            visitedSinceAT.add(dronePosition);
             navigateTo(end, orderNo);
             hover(orderNo); // hover when collecting from a restaurant
             navigateTo(APPLETON, orderNo);
