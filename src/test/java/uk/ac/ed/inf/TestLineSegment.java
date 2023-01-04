@@ -14,6 +14,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Unit tests for the Line Segment class.
+ * Ensures that individual public methods in this class work as expected.
+ */
 public class TestLineSegment {
 
     @BeforeEach

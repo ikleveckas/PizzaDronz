@@ -282,15 +282,18 @@ public class TestLngLat
     @Test
     public void testMoveNorthNorthWest() {
         LngLat point = new LngLat(-3.1924, 55.94637);
-        assertEquals(55.946508581929876,
-                (point.nextPosition(Direction.NNW)).lat(), DELTA);
+        double expected = 55.946508581929876;
+        double actual = point.nextPosition(Direction.NNW).lat();
+        assertEquals(expected, actual, DELTA);
     }
 
     @Test
     public void testMoveWestNorthWest() {
         LngLat point = new LngLat(-3.19, 55.946233);
-        assertEquals(-3.1901385819298764,
-                (point.nextPosition(Direction.WNW)).lng(), DELTA);
+        double expected = -3.1901385819298764;
+        double actual = point.nextPosition(Direction.WNW).lng();
+        assertEquals(expected,
+                actual, DELTA);
     }
 }
 

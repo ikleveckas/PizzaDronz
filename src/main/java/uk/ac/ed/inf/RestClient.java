@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Class for retrieving data from the Rest server.

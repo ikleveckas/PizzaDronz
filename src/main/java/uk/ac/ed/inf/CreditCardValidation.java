@@ -40,7 +40,32 @@ public class CreditCardValidation {
         return true;
     }
 
+    /**
+     * Confirms that the credit card details are valid, otherwise
+     * throws an appropriate exception.
+     * Currently supports Visa and Mastercard credit cards.
+     * @param cardNo the 16 digit credit card number.
+     * @param expiryDate the expiry date in MM/YY format.
+     * @param cvv the 3 digit cvv number.
+     * @param orderDate the date of an order for checking expiration.
+     * @return <code>ValidButNotDelivered</code> if the credit card is valid.
+     */
+    public static OrderOutcome validateCreditCardAlternative(String cardNo, String expiryDate,
+                                             String cvv, String orderDate) {
+        if (!validCardNo(cardNo)) {
+            return OrderOutcome.InvalidCardNumber;
+        } else if (expired(expiryDate, orderDate)) {
+            return OrderOutcome.InvalidExpiryDate;
+        } else if (!validCvv(cvv)) {
+            return OrderOutcome.InvalidCvv;
+        }
+        return OrderOutcome.ValidButNotDelivered;
+    }
+
     private static boolean validCardNo(String cardNo) {
+        if (cardNo == null) {
+            return false;
+        }
         return cardNo.length() == 16
                 && cardNo.matches("\\d+")
                 && checkLuhn(cardNo)
@@ -93,6 +118,9 @@ public class CreditCardValidation {
 
 
     private static boolean expired(String date, String orderDate) {
+        if (date == null || orderDate == null) {
+            return true;
+        }
         SimpleDateFormat creditCardFormat = new SimpleDateFormat("MM/yy");
         creditCardFormat.setLenient(false);
         SimpleDateFormat isoFormat = new SimpleDateFormat("yy-MM-dd");
@@ -112,6 +140,9 @@ public class CreditCardValidation {
     }
 
     private static boolean validCvv(String cvv) {
+        if (cvv == null) {
+            return false;
+        }
         return cvv.length() == 3 && cvv.matches("\\d+");
     }
 }

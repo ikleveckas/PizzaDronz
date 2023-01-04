@@ -61,6 +61,26 @@ public class Order{
         return orderNo;
     }
 
+    public String getOrderDate() {
+        return orderDate;
+    }
+
+    public int getPriceTotalInPence() {
+        return priceTotalInPence;
+    }
+
+    public String getCreditCardNumber() {
+        return creditCardNumber;
+    }
+
+    public String getCvv() {
+        return cvv;
+    }
+
+    public String getCreditCardExpiry() {
+        return creditCardExpiry;
+    }
+
     /**
      * @return {@link #setOutcome(OrderOutcome)}
      */
@@ -84,7 +104,7 @@ public class Order{
      * @throws InvalidPizzaCombinationException if the pizza combination cannot
      * be delivered from same restaurant
      */
-    public int getDeliveryCost(List<Restaurant> restaurants)
+    private int getDeliveryCost(List<Restaurant> restaurants)
             throws InvalidPizzaCombinationException,
             InvalidPizzaCountException,
             InvalidPizzaNotDefinedException {
@@ -182,10 +202,10 @@ public class Order{
             var calculatedPrice = getDeliveryCost(restaurants);
             if (calculatedPrice != priceTotalInPence) {
                 orderOutcome = OrderOutcome.InvalidTotal;
-            } else if (CreditCardValidation.validateCreditCard(
+            } else {
+                orderOutcome = CreditCardValidation.validateCreditCardAlternative(
                     creditCardNumber, creditCardExpiry,
-                    cvv, orderDate)) {
-                orderOutcome = OrderOutcome.ValidButNotDelivered;
+                    cvv, orderDate);
             }
         } catch (InvalidPizzaCountException e) {
             orderOutcome = OrderOutcome.InvalidPizzaCount;
@@ -193,14 +213,6 @@ public class Order{
             orderOutcome = OrderOutcome.InvalidPizzaCombinationMultipleSuppliers;
         } catch (InvalidPizzaNotDefinedException e) {
             orderOutcome = OrderOutcome.InvalidPizzaNotDefined;
-        } catch (InvalidCardNoException e) {
-            orderOutcome = OrderOutcome.InvalidCardNumber;
-        } catch (InvalidCreditCardExpiryException e) {
-            orderOutcome = OrderOutcome.InvalidExpiryDate;
-        } catch (InvalidCvvException e) {
-            orderOutcome = OrderOutcome.InvalidCvv;
         }
     }
-
-
 }
