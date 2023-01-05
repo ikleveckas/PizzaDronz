@@ -46,7 +46,7 @@ public class TestCreditCardValidation {
     void testCreditCardNumberValidationLength() {
         Order order = invalidCardNoLength;
         OrderOutcome expected = OrderOutcome.InvalidCardNumber;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -55,7 +55,7 @@ public class TestCreditCardValidation {
     void testCreditCardNumberValidationValue() {
         Order order = invalidCardNoValue;
         OrderOutcome expected = OrderOutcome.InvalidCardNumber;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -64,7 +64,7 @@ public class TestCreditCardValidation {
     void testCreditCardNumberValidationNull() {
         Order order = invalidCardNoNull;
         OrderOutcome expected = OrderOutcome.InvalidCardNumber;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -73,7 +73,7 @@ public class TestCreditCardValidation {
     void testCreditCardNumberValidationNegative() {
         Order order = invalidCardNoNegative;
         OrderOutcome expected = OrderOutcome.InvalidCardNumber;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -82,7 +82,7 @@ public class TestCreditCardValidation {
     void testCreditCardExpiryValidation() {
         Order order = invalidExpiryDate;
         OrderOutcome expected = OrderOutcome.InvalidExpiryDate;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -91,7 +91,7 @@ public class TestCreditCardValidation {
     void testCreditCardExpiryValidationFormatValue() {
         Order order = invalidExpiryFormatValue;
         OrderOutcome expected = OrderOutcome.InvalidExpiryDate;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -100,7 +100,7 @@ public class TestCreditCardValidation {
     void testCreditCardExpiryValidationNull() {
         Order order = invalidExpiryNull;
         OrderOutcome expected = OrderOutcome.InvalidExpiryDate;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -109,7 +109,7 @@ public class TestCreditCardValidation {
     void testCreditCardExpiryValidationJustExpired() {
         Order order = invalidExpiryJustExpired;
         OrderOutcome expected = OrderOutcome.InvalidExpiryDate;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -118,7 +118,7 @@ public class TestCreditCardValidation {
     void testCreditCardExpiryValidationFormat() {
         Order order = invalidExpiryFormat;
         OrderOutcome expected = OrderOutcome.InvalidExpiryDate;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -127,7 +127,7 @@ public class TestCreditCardValidation {
     void testCreditCardCvvValidation() {
         Order order = invalidCvv;
         OrderOutcome expected = OrderOutcome.InvalidCvv;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -136,7 +136,7 @@ public class TestCreditCardValidation {
     void testCreditCardCvvValidationNull() {
         Order order = invalidCvvNull;
         OrderOutcome expected = OrderOutcome.InvalidCvv;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -145,7 +145,7 @@ public class TestCreditCardValidation {
     void testCreditCardCvvValidationEmpty() {
         Order order = invalidCvvEmpty;
         OrderOutcome expected = OrderOutcome.InvalidCvv;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -154,7 +154,7 @@ public class TestCreditCardValidation {
     void testValidCreditCard1() {
         Order order = validCreditCardDetails1;
         OrderOutcome expected = OrderOutcome.ValidButNotDelivered;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }
@@ -163,7 +163,7 @@ public class TestCreditCardValidation {
     void testValidCreditCard2() {
         Order order = validCreditCardDetails2;
         OrderOutcome expected = OrderOutcome.ValidButNotDelivered;
-        OrderOutcome actual = CreditCardValidation.validateCreditCardAlternative(order.getCreditCardNumber(),
+        OrderOutcome actual = CreditCardValidation.validateCreditCard(order.getCreditCardNumber(),
                 order.getCreditCardExpiry(), order.getCvv(), order.getOrderDate());
         assertEquals(expected, actual);
     }

@@ -28,13 +28,12 @@ public class OrderProcessor {
      * @param date the date for which the orders should be processed.
      * @param baseUrl the base URL address of the Rest server.
      */
-    public OrderProcessor(String date, String baseUrl) {
+    public OrderProcessor(String date, String baseUrl)
+            throws IllegalDateFormatException, IllegalURLFormatException {
         if (validDateISO(date)) {
             this.date = date;
         } else {
-            System.err.println("The input date is invalid. Please input date in " +
-                    "YYYY-MM-DD format.");
-            System.exit(2);
+            throw new IllegalDateFormatException();
         }
         this.baseUrl = makeURL(baseUrl);
         orders = Order.getOrdersFromRestServer(this.baseUrl, date);
@@ -62,14 +61,11 @@ public class OrderProcessor {
         Output.createGeoJSON(drone.getVisited(), date);
     }
 
-    private URL makeURL(String string) {
+    private URL makeURL(String string) throws IllegalURLFormatException {
         try {
             return new URL(string);
         } catch (MalformedURLException e) {
-            System.err.println("Could not assign the default Rest server URL.");
-            e.printStackTrace();
-            System.exit(2);
-            return null; // will not be reached
+            throw new IllegalURLFormatException();
         }
     }
 

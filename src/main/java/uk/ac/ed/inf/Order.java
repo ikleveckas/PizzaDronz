@@ -203,7 +203,7 @@ public class Order{
             if (calculatedPrice != priceTotalInPence) {
                 orderOutcome = OrderOutcome.InvalidTotal;
             } else {
-                orderOutcome = CreditCardValidation.validateCreditCardAlternative(
+                orderOutcome = CreditCardValidation.validateCreditCard(
                     creditCardNumber, creditCardExpiry,
                     cvv, orderDate);
             }
