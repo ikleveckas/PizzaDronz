@@ -3,7 +3,6 @@ package uk.ac.ed.inf;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.stefanbirkner.systemlambda.SystemLambda;
 import com.google.gson.*;
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import uk.ac.ed.inf.Exceptions.IllegalNumberOfArgumentsException;
 import uk.ac.ed.inf.Exceptions.IllegalURLFormatException;
 import uk.ac.ed.inf.Navigation.Area;
 import uk.ac.ed.inf.Navigation.LngLat;
-import static com.github.stefanbirkner.systemlambda.SystemLambda.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -394,6 +392,40 @@ public class TestSystem {
         assertFalse(new File(fileName3).exists());
     }
 
+    @Test
+    void TestSystemPerformanceLightLoad1()
+            throws IllegalNumberOfArgumentsException, IllegalDateFormatException, IllegalURLFormatException {
+        long startTime = System.currentTimeMillis();
+        App.main(new String[]{"2023-02-02", baseAddress, "betjeinemokitaitunubas"});
+        long endTime = System.currentTimeMillis();
+        // Test the system runtime was less than 60 seconds (60000 ms)
+        assertTrue(endTime - startTime <= 60000);
+    }
+
+    @Test
+    void TestSystemPerformanceLightLoad2()
+            throws IllegalNumberOfArgumentsException, IllegalDateFormatException, IllegalURLFormatException {
+        long startTime = System.currentTimeMillis();
+        App.main(new String[]{"2023-03-20", baseAddress, "jeituskaitaisitatumldc"});
+        long endTime = System.currentTimeMillis();
+
+        // Test the system runtime was less than 60 seconds (60000 ms)
+        assertTrue(endTime - startTime <= 60000);
+    }
+
+    @Test
+    void TestSystemPerformanceHeavyLoad()
+            throws IllegalNumberOfArgumentsException, IllegalDateFormatException, IllegalURLFormatException {
+        long startTime = System.currentTimeMillis();
+
+        // Get orders for all days
+        App.main(new String[]{"", baseAddress, "Turmtsitaskaitai?"});
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        System.out.println(elapsedTime);
+
+        // Test the system runtime was less than 60 seconds (60000 ms)
+        assertTrue(elapsedTime <= 60000);
+    }
 
 
     private double getDistance(double lng1, double lat1, double lng2, double lat2) {

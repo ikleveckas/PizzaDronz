@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * Class for retrieving data from the Rest server.
  */
 public class RestClient {
-    URL baseUrl;
+    static URL baseUrl;
 
     /**
      * Constructs the object for data retrieval from the Rest server.
@@ -60,7 +60,7 @@ public class RestClient {
         return generateResponse(finalURL, klass);
     }
 
-    private <T> T generateResponse(URL finalURL, Class<T> klass) {
+     static <T> T generateResponse(URL finalURL, Class<T> klass) {
         T response = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();

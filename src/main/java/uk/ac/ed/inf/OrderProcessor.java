@@ -89,6 +89,9 @@ public class OrderProcessor {
     }
 
     private boolean validDateISO(String isoDate) {
+        if (isoDate == "") { // in case all orders need to be processed
+            return true;
+        }
         SimpleDateFormat isoFormat = new SimpleDateFormat("yy-MM-dd");
         isoFormat.setLenient(false);
         try {
